@@ -1,0 +1,14 @@
+{
+  "name": "consumemx-secured",
+  "alias": ["consumemx-secured-api"],
+  "version": 2,
+  "builds": [{ "src": "index.js", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "/index.js" }],
+  "env": {
+    "DB_USER": "@consumemx-db-user",
+    "DB_PASSWORD": "@consumemx-db-password",
+    "DB_HOST": "@consumemx-db-host",
+    "DB_NAME": "@consumemx-db-name",
+    "AUTH_JWT_SECRET": "@consumemx-auth-jwt-secret"
+  }
+}
