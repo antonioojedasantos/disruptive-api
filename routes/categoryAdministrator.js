@@ -34,8 +34,22 @@ function categoryApi(app) {
           };
 
         await categoryServices.createCategory({categoryDetail});
+
+        const categories = await categoryServices.getCategory();
+        const categoriesSorted = categories.sort((first, second) => {
+          if (first.created_at > second.created_at) {
+            return -1;
+          }
+
+          if (first.created_at < second.created_at) {
+            return 1;
+          }
+          // a must be equal to b
+          return 0;
+        });
        
         res.status(200).json({
+          categories:categoriesSorted,
           message: 'themes retrieved',
           status_code: 200
         });

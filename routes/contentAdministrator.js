@@ -12,12 +12,16 @@ const {
 
 const validationHandler = require('../utils/middleware/validationHandler');
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler');
+const CategoryService = require('../services/category');
+const ThemesService = require("../services/theme")
 
-function themeApi(app) {
+function contentApi(app) {
   const router = express.Router();
   app.use('/api/content', router);
   const usersService = new UsersService();
   const contentService = new ContentService();
+  const categoryservice = new CategoryService();
+  const themeService = new ThemesService();
 
 
   router.post(
@@ -27,7 +31,6 @@ function themeApi(app) {
     validationHandler(newContentSchema),
     async function(req, res, next) {
       try {
-
         const userFound = await usersService.getUserById({userId:req.user._id});
         if(!userFound){
           next(
@@ -35,13 +38,21 @@ function themeApi(app) {
           );
           return;
         }
+        let typeFound = "" 
 
+        if(req.body.categoryOrTheme === 'categoria'){
+          typeFound = await categoryservice.getCategoryById(req.body.selectedCategory)
+        }else{
+          typeFound = await themeService.getThemesById(req.body.selectedTheme)
+        }
+        
         const contentDetail = {
             name: req.body.name,
-            permission: req.body.permission,
-            image_url: req.body.image_url,
-            type:req.body.type,
-            type_detail: req.body.type_detail,
+            permission: typeFound.permission,
+            image_url: req.body.imageUrl,
+            type: req.body.categoryOrTheme,
+            type_detail: typeFound.name,
+            type_id: typeFound._id,
             ndtl_user_id: userFound._id,
             created_by: userFound.user_name,
             created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -67,7 +78,9 @@ function themeApi(app) {
     scopesValidationHandler(['read:content']),
     async function(req, res, next) {
       try {
-        const contents = await contentService.getContentss();
+        
+        const type = req.query;        
+        const contents = await contentService.getContentss(type);
         const contentSorted = contents.sort((first, second) => {
           if (first.created_at > second.created_at) {
             return -1;
@@ -94,4 +107,4 @@ function themeApi(app) {
 
 }
 
-module.exports = themeApi;
+module.exports = contentApi;

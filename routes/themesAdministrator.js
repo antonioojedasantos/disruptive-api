@@ -34,8 +34,22 @@ function themeApi(app) {
           };
 
         await themeServices.createTheme({themeDetail});
+
+        const themes = await themeServices.getThemes();
+        const themesSorted = themes.sort((first, second) => {
+          if (first.created_at > second.created_at) {
+            return -1;
+          }
+
+          if (first.created_at < second.created_at) {
+            return 1;
+          }
+          // a must be equal to b
+          return 0;
+        });
        
         res.status(200).json({
+          themes:themesSorted,
           message: 'themes retrieved',
           status_code: 200
         });

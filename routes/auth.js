@@ -17,7 +17,8 @@ const {
   confirmationTokenSchema,
   passwordResetSchema,
   forgotPasswordSchema,
-  createProviderUserSchema
+  createProviderUserSchema,
+  createUserAdminSchema
 } = require('../utils/schemas/users');
 
 const { config } = require('../config');
@@ -207,6 +208,7 @@ function authApi(app) {
       }
       const apiKey = await apiKeysService.getApiKeyByType({ type: user.type_user });
       const confirmationToken = randtoken.uid(256);
+
       user.confirmed = true;
       user.enabled = true;
       user.created_by = 'Aplicacion web';
@@ -217,9 +219,32 @@ function authApi(app) {
       user.assigned = false;
 
       const createdUserId = await usersService.createUser({ user });
+
+
+      const apiKeyToken = await apiKeysService.getApiKeyById({
+        apiKeyId: user.scope_type_id
+      });
+
+      if (!apiKeyToken) {
+        next(boom.unauthorized());
+        return;
+      }
       
+      const {  user_name, email } = user;
+
+          const payload = {
+            sub: createdUserId,
+            user_name,
+            email,
+            scopes: apiKeyToken.scopes
+          };
+
+          const token = jwt.sign(payload, config.authJwtSecret, {
+            expiresIn: '15m'
+          });
         res.status(200).json({
           _id: createdUserId,
+          token,
           confirmation_token: confirmationToken,
           user: user,
           message: 'user created',
@@ -233,39 +258,69 @@ function authApi(app) {
 
   router.post(
     '/security/admin/sign-up',
-    validationHandler(createUserSchema),
+    validationHandler(createUserAdminSchema),
     async function(req, res, next) {
       const { body: user } = req;
-
-      const userFound = await usersService.getUser({ email: user.email });
-
-      if (userFound) {
-        next(boom.badRequest('El correo que intentas usar no esta disponible'));
-        return;
-      }
-
-      const apiKey = await apiKeysService.getApiKeyByType({ type: 'root' });
-      user.type_user = 'root';
-      user.confirmed = true;
-      user.enabled = true;
-      user.created_by = null;
-      user.confirmation_token = null;
-      (user.password_reset_token = null),
-        (user.created_at = moment().format('YYYY-MM-DD HH:mm:ss'));
-      user.updated_at = moment().format('YYYY-MM-DD HH:mm:ss');
-      user.confirmed_at = moment().format('YYYY-MM-DD HH:mm:ss');
-      user.scope_type_id = apiKey._id;
-      user.assigned = false;
-
       try {
+        const userFound = await usersService.getUser({ email: user.email });
+  
+        if (userFound) {
+          next(boom.badRequest('El nombre de usuario/correo que intentas usar no esta disponible'));
+          return;
+        }
+        const userFound2 = await usersService.getUser({ user_name: user.user_name });
+        if (userFound2) {
+          next(boom.badRequest('El nombre de usuario/correo que intentas usar no esta disponible'));
+          return;
+        }
+        const apiKey = await apiKeysService.getApiKeyByType({ type: 'admin' });
+        const confirmationToken = randtoken.uid(256);
+  
+        user.confirmed = true;
+        user.enabled = true;
+        user.created_by = 'Aplicacion web';
+        user.confirmation_token = confirmationToken;
+        user.created_at = moment().format('YYYY-MM-DD HH:mm:ss');
+        user.updated_at = moment().format('YYYY-MM-DD HH:mm:ss');
+        user.scope_type_id = apiKey._id;
+        user.assigned = false;
+        user.type_user = 'admin'
+  
         const createdUserId = await usersService.createUser({ user });
-        res.status(201).json({
-          _id: createdUserId,
-          message: 'user created'
+  
+  
+        const apiKeyToken = await apiKeysService.getApiKeyById({
+          apiKeyId: user.scope_type_id
         });
-      } catch (error) {
-        next(error);
-      }
+  
+        if (!apiKeyToken) {
+          next(boom.unauthorized());
+          return;
+        }
+        
+        const {  user_name, email } = user;
+  
+            const payload = {
+              sub: createdUserId,
+              user_name,
+              email,
+              scopes: apiKeyToken.scopes
+            };
+  
+            const token = jwt.sign(payload, config.authJwtSecret, {
+              expiresIn: '15m'
+            });
+          res.status(200).json({
+            _id: createdUserId,
+            token,
+            confirmation_token: confirmationToken,
+            user: user,
+            message: 'user created',
+            status_code: 200
+          });
+        } catch (error) {
+          next(error);
+        }
     }
   );
 

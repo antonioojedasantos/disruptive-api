@@ -6,8 +6,8 @@ class ContentService {
     this.mongoDB = new MongoLib();
   }
 
-  async getContentss() {
-    const themes = await this.mongoDB.getAll(this.collection, { });
+  async getContentss( type) {
+    const themes = await this.mongoDB.getAll(this.collection, type);
     return themes || [];
   }
   
@@ -18,6 +18,7 @@ class ContentService {
     image_url,
     type,
     type_detail,
+    type_id,
     ndtl_user_id,
       assigned,
       created_by,
@@ -30,6 +31,7 @@ class ContentService {
       permission,
       image_url,
       type,
+      type_id,
       type_detail,
       ndtl_user_id,
         assigned,
