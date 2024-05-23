@@ -7,6 +7,7 @@ const { config } = require('./config/index');
 const authApi = require('./routes/auth');
 const themeApi = require('./routes/themesAdministrator')
 const categoryApi = require('./routes/categoryAdministrator');
+const contentApi = require("./routes/contentAdministrator")
 const cors = require('cors');
 
 
@@ -28,6 +29,7 @@ app.use(helmet());
 authApi(app);
 themeApi(app);
 categoryApi(app);
+contentApi(app);
 
 
 // Catch 404

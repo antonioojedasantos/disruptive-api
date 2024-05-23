@@ -48,6 +48,16 @@ const createUserSchema = {
     .max(15)
     .required(),
 };
+const createUserAdminSchema = {
+  user_name: joi
+    .string()
+    .max(100)
+    .required(),
+  email: joi
+    .string()
+    .email()
+    .required()
+};
 
 
 module.exports = {
@@ -55,4 +65,5 @@ module.exports = {
   confirmationTokenSchema,
   forgotPasswordSchema,
   passwordResetSchema,
+  createUserAdminSchema,
 };

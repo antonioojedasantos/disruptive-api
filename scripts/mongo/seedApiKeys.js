@@ -8,68 +8,23 @@ const MongoLib = require('../../lib/mongo');
 
 const adminScopes = [
   'create:theme',
-  'signup:auth',
-  'read:commerce',
-  'create:commerce',
-  'update:commerce',
-  'delete:commerce',
-  'read:commerce-details',
-  'create:commerce-details',
-  'update:commerce-details',
-  'delete:commerce-details',
-  'create:subsidiary',
-  'read:subsidiary',
-  'update:subsidiary',
-  'delete:subsidiary',
-  'create:all-commerces',
-  'read:all-commerces',
-  'update:all-commerces',
-  'delete:all-commerces',
-  'read:offer',
-  'update:audience',
-  'read:audience',
-  'create:sms',
-  'read:sms',
+  'read:theme',
+  'create:content',
+  'read:content',
+  'create:category,'
 ];
 
 const readerScopes = [
-  'signin:auth',
-  'signup:auth',
-  'create:commerce',
-  'read:commerce',
-  'update:commerce',
-  'read:commerce-details',
-  'create:subsidiary',
-  'read:subsidiary',
-  'update:subsidiary',
-  'delete:subsidiary',
-  'read:offer',
-  'update:offer',
-  'create:offer',
-  'create:audience',
-  'read:audience',
-  'create:agency',
-  'delete:audience',
-  'update:audience',
-  'delete:employee',
-  'assing:audience',
-  'create:sms',
-  'read:sms',
-  'create:employee',
-  'read:employee'
+'read:content',
+'read:theme',
+'read:content'
+ 
 ];
 
 const creatorScopes = [
-  'signin:auth',
-  'signup:auth',
-  'read:commerce-details',
-  'create:subsidiary',
-  'read:subsidiary',
-  'update:subsidiary',
-  'delete:subsidiary',
-  'read:audience',
-  'create:sms',
-  'read:sms',
+  'read:theme',
+'create:theme',
+'read:content'
 ];
 
 const apiKeys = [

@@ -11,6 +11,11 @@ class ThemesService {
     return themes || [];
   }
 
+  async getThemesById(id) {
+    const categories = await this.mongoDB.getId(this.collection,  id);
+    return categories;
+  }
+
   async createTheme({ themeDetail }) {
     const {
     name,

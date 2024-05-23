@@ -11,6 +11,11 @@ class CategoryService {
     return categories || [];
   }
 
+  async getCategoryById(id) {
+    const categories = await this.mongoDB.getId(this.collection,  id);
+    return categories;
+  }
+
   async createCategory({ categoryDetail }) {
     const {
     name,
